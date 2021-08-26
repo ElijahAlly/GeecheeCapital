@@ -24,10 +24,10 @@ module.exports = function validateRegisterInput(data) {
 	}
 
 	if (!email.includes('@') || !email.includes('.')) {
-		errors.email = 'Invalid Email Format';
+		errors.email = 'Check yo email fool';
 	}
 
-	if (!isEmail(email)) {
+	if (!isEmail(email, {domain_specific_validation: true})) {
 		errors.email = 'Email is invalid';
 	}
 

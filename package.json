@@ -1,7 +1,7 @@
 {
-  "name": "backend-template",
+  "name": "geechee-capital",
   "version": "1.0.0",
-  "description": "backend template using graphql, mongoose, express, nodejs, and mongodb",
+  "description": "Geechee Capital",
   "main": "index.js",
   "engines": {
     "node": "^10.13.0",
