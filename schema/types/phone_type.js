@@ -1,10 +1,11 @@
 const graphql = require('graphql');
-const { GraphQLObjectType, GraphQLString } = graphql;
+const { GraphQLObjectType, GraphQLString, GraphQLID } = graphql;
 
 const PhoneType = new GraphQLObjectType({
 	name: 'PhoneType',
 	fields: () => ({
-		type: { type: GraphQLString },
+		id: { type: GraphQLID, description: 'The id of the phone type' },
+		type: { type: GraphQLString, description: 'Type of phone' },
 	}),
 });
 

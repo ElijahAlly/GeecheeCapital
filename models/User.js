@@ -90,6 +90,12 @@ const UserSchema = new Schema({
 			ref: 'Project',
 		},
 	],
+	projectComments: [
+		{
+			type: ObjectId,
+			ref: 'ProjectComment',
+		},
+	],
 	likedProjectComments: [
 		{
 			type: ObjectId,
@@ -126,13 +132,16 @@ const UserSchema = new Schema({
 	},
 });
 
-UserSchema.method('convertId', function() {
-    var obj = this.toObject();
+// convert _id => id (remove underscore)
+// async e.g. => const user = await User.findById(<user_id>).convertId();
 
-    obj.id = obj._id;
-    delete obj._id;
+// UserSchema.method('convertId', function() {
+//     var obj = this.toObject();
 
-    return obj;
-});
+//     obj.id = obj._id;
+//     delete obj._id;
+
+//     return obj;
+// });
 
 module.exports = User = mongoose.model('User', UserSchema);

@@ -16,6 +16,12 @@ const ProjectCommentSchema = new Schema({
         trim: true,
         required: true,
     },
+    replies: [
+        {
+            type: ObjectId,
+            ref: 'ProjectComment'
+        }
+    ],
     likes: [
         {
             type: ObjectId,

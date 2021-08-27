@@ -53,7 +53,6 @@ const BusinessSchema = new Schema({
 				ref: 'Keyword',
 			},
 		],
-		required: true,
 	},
     followers: [
         {

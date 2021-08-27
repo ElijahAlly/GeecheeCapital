@@ -74,7 +74,6 @@ const ProjectSchema = new Schema({
 				ref: 'Keyword',
 			},
 		],
-		required: true,
 	},
 	likes: [
 		{
@@ -134,7 +133,6 @@ const ProjectSchema = new Schema({
 				ref: 'ProjectType',
 			},
 		],
-		required: true,
 	},
 	risks: [
 		{
