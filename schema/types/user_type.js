@@ -8,9 +8,9 @@ const {
 } = graphql;
 
 const mongoose = require('mongoose');
+const User = mongoose.model('User');
 const Address = mongoose.model('Address');
 const File = mongoose.model('File');
-const User = mongoose.model('User');
 const Project = mongoose.model('Project');
 const ProjectComment = mongoose.model('ProjectComment');
 const Tradeline = mongoose.model('Tradeline');
@@ -160,7 +160,7 @@ const UserType = new GraphQLObjectType({
 		},
 		projectsInvestedIn: {
 			type: new GraphQLList(require('./project_type')),
-			description: "List of projects invested in by user",
+			description: 'List of projects invested in by user',
 			args: { ids: { type: new GraphQLList(GraphQLID) } },
 			async resolve(parentValue, { ids }) {
 				try {
@@ -172,7 +172,7 @@ const UserType = new GraphQLObjectType({
 		},
 		followedProjects: {
 			type: new GraphQLList(require('./project_type')),
-			description: "List of projects followed by the user",
+			description: 'List of projects followed by the user',
 			args: { ids: { type: new GraphQLList(GraphQLID) } },
 			async resolve(parentValue, { ids }) {
 				try {
@@ -184,7 +184,7 @@ const UserType = new GraphQLObjectType({
 		},
 		projectMemberships: {
 			type: new GraphQLList(require('./project_type')),
-			description: "List of project memberships for user",
+			description: 'List of project memberships for user',
 			args: { ids: { type: new GraphQLList(GraphQLID) } },
 			async resolve(parentValue, { ids }) {
 				try {
@@ -208,7 +208,7 @@ const UserType = new GraphQLObjectType({
 		},
 		tradelines: {
 			type: new GraphQLList(require('./tradeline_type')),
-			description: "List of tradelines bought by user",
+			description: 'List of tradelines bought by user',
 			args: { ids: { type: new GraphQLList(GraphQLID) } },
 			async resolve(parentValue, { ids }) {
 				try {
@@ -220,8 +220,8 @@ const UserType = new GraphQLObjectType({
 		},
 		createdOn: {
 			type: GraphQLString,
-			description: 'Date user account was created'
-		}
+			description: 'Date user account was created',
+		},
 	}),
 });
 

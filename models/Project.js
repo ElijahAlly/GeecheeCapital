@@ -51,10 +51,16 @@ const ProjectSchema = new Schema({
 		type: Number,
 		required: false,
 	},
-	address: {
+	primaryAddress: {
 		type: ObjectId,
 		ref: 'Address',
 	},
+	addresses: [
+		{
+			type: ObjectId,
+			ref: 'Address',
+		},
+	],
 	owners: [
 		{
 			type: ObjectId,
@@ -93,31 +99,12 @@ const ProjectSchema = new Schema({
 			ref: 'ProjectComment',
 		},
 	],
-	blogs: [
-		{
-			type: ObjectId,
-			ref: 'ProjectBlog',
-		},
-	],
 	files: [
 		{
 			type: ObjectId,
 			ref: 'File',
 		},
 	],
-	// not nessasary, can just loop through files on frontend and check which type the file is
-	// images: [
-	// 	{
-	// 		type: ObjectId,
-	// 		ref: 'File',
-	// 	},
-	// ],
-	// videos: [
-	// 	{
-	// 		type: ObjectId,
-	// 		ref: 'File',
-	// 	},
-	// ],
 	featuredImage: {
 		type: ObjectId,
 		ref: 'File',

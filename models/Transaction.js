@@ -25,15 +25,7 @@ const TransactionSchema = new Schema(
             required: true, 
             default: false 
         },
-		status: { 
-            type: String, 
-            required: false 
-        },
 		purchaseDate: { 
-            type: Date, 
-            required: true 
-        },
-		purchaseTimeStamp: { 
             type: Date, 
             required: true 
         },
