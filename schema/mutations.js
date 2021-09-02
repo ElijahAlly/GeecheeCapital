@@ -2,21 +2,32 @@ const graphql = require('graphql');
 const { GraphQLObjectType } = graphql;
 
 const UserMutations = require('./mutations/user_mutations');
-const { createUser, deleteUser, updateUser, login } = UserMutations;
+const { createUser, updateUser, login } = UserMutations;
 
 const mutation = new GraphQLObjectType({
 	name: 'Mutation',
-	fields: {
+	fields: () => ({
 		// users
 		createUser,
-		deleteUser,
 		updateUser,
+		// deleteUser,
 		login,
 
-		// projects
+		// // projects
+		// createProject,
+		// updateProject,
+		// deleteProject,
 
-		// comments
-	},
+		// // comments
+		// createComment,
+		// updateComment,
+		// deleteComment,
+
+		// // business
+		// createBusiness,
+		// updateBusiness,
+		// deleteBusiness,
+	}),
 });
 
 module.exports = mutation;

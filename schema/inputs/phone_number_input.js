@@ -1,10 +1,9 @@
 const graphql = require('graphql');
-const { GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLID, GraphQLNonNull } = graphql;
+const { GraphQLInputObjectType, GraphQLString, GraphQLBoolean, GraphQLID, GraphQLNonNull } = graphql;
 
-const PhoneNumberType = new GraphQLObjectType({
-	name: 'PhoneNumberType',
+const phone_number_input = new GraphQLInputObjectType({
+	name: 'phone_number_input',
 	fields: () => ({
-		id: { type: GraphQLID, description: 'The id of the phone number' },
 		number: {
 			type: GraphQLString,
 			description: 'The phone number of the user',
@@ -20,4 +19,4 @@ const PhoneNumberType = new GraphQLObjectType({
 	}),
 });
 
-module.exports = PhoneNumberType;
+module.exports = phone_number_input;

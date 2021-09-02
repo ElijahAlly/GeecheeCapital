@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const address = require('./object_util/address');
 const Schema = mongoose.Schema;
 const { ObjectId } = Schema.Types;
 
@@ -20,13 +21,13 @@ const UserSchema = new Schema({
 	},
 	primaryPhoneNumber: {
 		number: { type: String, required: true, trim: true },
-		phoneType: { type: ObjectId, ref: 'PhoneType' },
-		primary: { type: Boolean, required: true },
+		phoneType: { type: String, required: true, trim: true  },
+		primary: { type: Boolean, default: true },
 	},
 	phoneNumbers: [
 		{
 			number: { type: String, required: true, trim: true },
-			phoneType: { type: ObjectId, ref: 'PhoneType' },
+			phoneType: { type: String, required: true, trim: true  },
 			primary: { type: Boolean, required: true },
 		},
 	],
@@ -41,15 +42,9 @@ const UserSchema = new Schema({
 			trim: true,
 		},
 	],
-	primaryAddress: {
-		type: ObjectId,
-		ref: 'Address',
-	},
+	primaryAddress: address,
 	addresses: [
-		{
-			type: ObjectId,
-			ref: 'Address',
-		},
+		address,
 	],
 	files: [
 		{

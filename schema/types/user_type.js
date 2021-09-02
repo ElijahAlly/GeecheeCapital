@@ -9,7 +9,6 @@ const {
 
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
-const Address = mongoose.model('Address');
 const File = mongoose.model('File');
 const Project = mongoose.model('Project');
 const ProjectComment = mongoose.model('ProjectComment');
@@ -19,7 +18,7 @@ const Business = mongoose.model('Business');
 const UserType = new GraphQLObjectType({
 	name: 'UserType',
 	fields: () => ({
-		id: { type: GraphQLID, description: 'The id of the user' },
+		_id: { type: GraphQLID, description: 'The id of the user' },
 		firstName: {
 			type: GraphQLString,
 			description: 'The first name of the user',
@@ -45,34 +44,19 @@ const UserType = new GraphQLObjectType({
 		primaryAddress: {
 			type: require('./address_type'),
 			description: 'The primary address of the user',
-			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-			async resolve(parentValue, { id }) {
-				try {
-					return await Address.findById(id);
-				} catch (err) {
-					console.log(err);
-				}
-			},
 		},
 		addresses: {
 			type: new GraphQLList(require('./address_type')),
 			description: 'The address list of the user',
-			args: { ids: { type: new GraphQLList(GraphQLID) } },
-			async resolve(parentValue, { ids }) {
-				try {
-					return await Address.find({ _id: { $in: ids } });
-				} catch (err) {
-					console.log(err);
-				}
-			},
 		},
 		files: {
 			type: new GraphQLList(require('./file_type')),
 			description: 'The list of files for a user',
-			args: { ids: { type: new GraphQLList(GraphQLID) } },
-			async resolve(parentValue, { ids }) {
+			args: { _id: { type: GraphQLID } },
+			async resolve(parentValue, { _id }) {
 				try {
-					return await File.find({ _id: { $in: ids } });
+					const user = await User.findById(_id);
+					return await File.find({ _id: { $in: user.files } });
 				} catch (err) {
 					console.log(err);
 				}
@@ -89,10 +73,11 @@ const UserType = new GraphQLObjectType({
 		followers: {
 			type: new GraphQLList(require('./user_type')),
 			description: 'List of followers for a user',
-			args: { ids: { type: new GraphQLList(GraphQLID) } },
-			async resolve(parentValue, { ids }) {
+			args: { _id: { type: GraphQLID } },
+			async resolve(parentValue, { _id }) {
 				try {
-					return await User.find({ _id: { $in: ids } });
+					const user = await User.findById(_id);
+					return await User.find({ _id: { $in: user.followers } });
 				} catch (err) {
 					console.log(err);
 				}
@@ -101,10 +86,11 @@ const UserType = new GraphQLObjectType({
 		following: {
 			type: new GraphQLList(require('./user_type')),
 			description: 'List of followers for a user',
-			args: { ids: { type: new GraphQLList(GraphQLID) } },
-			async resolve(parentValue, { ids }) {
+			args: { _id: { type: GraphQLID } },
+			async resolve(parentValue, { _id }) {
 				try {
-					return await User.find({ _id: { $in: ids } });
+					const user = await User.findById(_id);
+					return await User.find({ _id: { $in: user.following } });
 				} catch (err) {
 					console.log(err);
 				}
@@ -222,6 +208,10 @@ const UserType = new GraphQLObjectType({
 			type: GraphQLString,
 			description: 'Date user account was created',
 		},
+		error: {
+			type: GraphQLString,
+			description: 'User errors'
+		}
 	}),
 });
 

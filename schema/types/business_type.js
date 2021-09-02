@@ -2,13 +2,11 @@ const graphql = require('graphql');
 const {
 	GraphQLObjectType,
 	GraphQLString,
-	GraphQLNonNull,
 	GraphQLList,
 	GraphQLID,
 } = graphql;
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
-const Address = mongoose.model('Address');
 const Keyword = mongoose.model('Keyword');
 
 const BusinessType = new GraphQLObjectType({
@@ -33,35 +31,19 @@ const BusinessType = new GraphQLObjectType({
 		},
 		primaryAddress: {
 			type: require('./address_type'),
-			description: 'The primary address of the user',
-			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-			async resolve(parentValue, { id }) {
-				try {
-					return await Address.findById(id);
-				} catch (err) {
-					console.log(err);
-				}
-			},
+			description: 'The primary address of the business',
 		},
 		addresses: {
 			type: new GraphQLList(require('./address_type')),
-			description: 'The address list of the user',
-			args: { ids: { type: new GraphQLList(GraphQLID) } },
-			async resolve(parentValue, { ids }) {
-				try {
-					return await Address.find({ _id: { $in: ids } });
-				} catch (err) {
-					console.log(err);
-				}
-			},
+			description: 'The address list of the business',
 		},
 		primaryPhoneNumber: {
 			type: require('./phone_number_type'),
-			description: 'The primary phone of the user',
+			description: 'The primary phone of the business',
 		},
 		phoneNumbers: {
 			type: new GraphQLList(require('./phone_number_type')),
-			description: 'The phone list of the user',
+			description: 'The phone list of the business',
 		},
 		businessType: {
 			type: GraphQLString,
@@ -85,7 +67,7 @@ const BusinessType = new GraphQLObjectType({
 		},
 		followers: {
 			type: new GraphQLList(require('./user_type')),
-			description: 'List of followers for a user',
+			description: 'List of followers for a business',
 			args: { ids: { type: new GraphQLList(GraphQLID) } },
 			async resolve(parentValue, { ids }) {
 				try {

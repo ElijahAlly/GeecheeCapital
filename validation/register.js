@@ -5,43 +5,43 @@ const isEmpty = Validator.isEmpty;
 const validText = require('./valid_text');
 
 module.exports = function validateRegisterInput(data) {
-	let errors = {};
 
-	let name = validText(data.name) ? data.name : '';
-	let email = validText(data.email) ? data.email : '';
+	let firstName = validText(data.firstName) ? data.firstName : '';
+	let lastName = validText(data.lastName) ? data.lastName : '';
+	let email = validText(data.primaryEmail) ? data.primaryEmail : '';
 	let password = validText(data.password) ? data.password : '';
 
-	if (!isLength(name, { min: 2, max: 30 })) {
-		errors.name = 'name must be between 2 and 30 characters';
+	if (!isLength(firstName, { min: 2, max: 30 })) {
+		return 'First name must be between 2 and 30 characters';
 	}
 
-	if (isEmpty(name)) {
-		errors.name = 'name field is required';
+	if (isEmpty(firstName)) {
+		return 'First name field is required';
+	}
+
+	if (!isLength(lastName, { min: 2, max: 30 })) {
+		return 'Last name must be between 2 and 30 characters';
+	}
+
+	if (isEmpty(lastName)) {
+		return 'Last name field is required';
 	}
 
 	if (isEmpty(email)) {
-		errors.email = 'Email field is required';
+		return 'Email field is required';
 	}
 
-	if (!email.includes('@') || !email.includes('.')) {
-		errors.email = 'Check yo email fool';
-	}
-
-	if (!isEmail(email, {domain_specific_validation: true})) {
-		errors.email = 'Email is invalid';
+	if (!isEmail(email, { domain_specific_validation: true })) {
+		return 'Email is invalid';
 	}
 
 	if (isEmpty(password)) {
-		errors.password = 'Password field is required';
+		return 'Password field is required';
 	}
 
 	if (!isLength(password, { min: 6, max: 30 })) {
-		errors.password = 'Password must be at least 6 characters';
+		return 'Password must be at least 6 characters';
 	}
 
-	return {
-		errors,
-		isValid: Object.keys(errors).length === 0,
-	};
+	return null;
 };
-

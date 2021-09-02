@@ -4,12 +4,9 @@ const { GraphQLString, GraphQLNonNull, GraphQLID } = graphql;
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
-const UserType = require('../types/user_type');
-
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const keys = require('../../config/keys.js');
-const passport = require('passport');
 
 // validations
 const validateRegisterInput = require('../../validation/register');
@@ -17,110 +14,193 @@ const validateLoginInput = require('../../validation/login');
 
 const UserMutations = {
 	createUser: {
-		type: UserType,
+		type: require('../types/user_type'),
 		args: {
-			name: { type: new GraphQLNonNull(GraphQLString) },
-			email: { type: new GraphQLNonNull(GraphQLString) },
-			password: { type: new GraphQLNonNull(GraphQLString) },
+			// required to create a user
+			firstName: {
+				type: new GraphQLNonNull(GraphQLString),
+				description: 'The first name of the user',
+			},
+			lastName: {
+				type: new GraphQLNonNull(GraphQLString),
+				description: 'The last name of the user',
+			},
+			password: {
+				type: new GraphQLNonNull(GraphQLString),
+				description: "The user's password",
+			},
+			primaryEmail: {
+				type: new GraphQLNonNull(GraphQLString),
+				description: 'The primary email name for the user',
+			},
+			primaryPhoneNumber: {
+				type: new GraphQLNonNull(require('../inputs/phone_number_input')),
+				description: 'The primary phone of the user',
+			},
+			primaryAddress: {
+				type: new GraphQLNonNull(require('../inputs/address_input')),
+				description: 'The primary address of the user',
+			},
+			// not required to create a user
+			bio: {
+				type: GraphQLString,
+				description: 'The bio of a user (200 chars limit)',
+			},
+			// profilePic: {
+			// 	type: require('../types/file_type'),
+			// 	description: 'The profile picture for a user',
+			// },
 		},
 		async resolve(parentValue, args) {
-			const { errors, isValid } = validateRegisterInput(args);
+			const error = validateRegisterInput(args);
 
-			if (!isValid) return { userErrors: errors };
-			const { email, password, name } = args;
+			if (error) {
+				return { error };
+			}
+
+			const { primaryEmail, password, primaryPhoneNumber } = args;
 
 			try {
-				const user = await User.findOne({ email });
+				const emailExists = await User.findOne({ primaryEmail });
+				const phoneNumberExists = await User.findOne({ primaryPhoneNumber });
 
-				if (user) {
-					console.log('user already exists');
+				if (emailExists) {
 					return {
-						userErrors: {
-							valid: 'A user has already registered with this email address',
-						},
+						error: 'A user has already registered with this email address',
 					};
-				} else {
-					const resUser = {};
-					const hashPassword = new Promise((res, reject) =>
-						bcrypt.hash(password, 10, async (err, hash) => {
-							if (err) throw err;
+				} else if (phoneNumberExists) {
+					return {
+						error: 'A user has already registered with this phone number',
+					};
+				}
+
+				const hashPassword = new Promise((res, reject) =>
+					bcrypt.hash(password, 10, async (err, hash) => {
+						if (err) throw err;
+
+						try {
 							const newUser = await new User({
-								name,
-								email,
+								...args,
 								password: hash,
 							});
 
-							resUser.id = newUser._id;
-							resUser.name = newUser.name;
-							resUser.email = newUser.email;
+							await newUser.save();
+							res(newUser);
+							return;
+						} catch (err) {
+							res({
+								error: `${err}`,
+							});
+							return;
+						}
+					})
+				);
 
-							try {
-								newUser.save();
-								res('user created');
-							} catch (err) {
-								console.log(err);
-								res(err);
-							}
-						})
-					);
-
-					await hashPassword;
-					return resUser;
-				}
+				const returnedUser = await hashPassword;
+				return returnedUser;
 			} catch (err) {
-				console.log(err);
+				return {
+					error: `${err}`,
+				};
 			}
 		},
 	},
 	updateUser: {
-		type: UserType,
+		type: require('../types/user_type'),
 		args: {
-			id: { type: new GraphQLNonNull(GraphQLID) },
-			name: { type: GraphQLString },
-			email: { type: GraphQLString },
-			password: { type: GraphQLString },
+			_id: { type: new GraphQLNonNull(GraphQLID) },
+			firstName: {
+				type: GraphQLString,
+				description: 'The first name of the user',
+			},
+			lastName: {
+				type: GraphQLString,
+				description: 'The last name of the user',
+			},
+			password: {
+				type: GraphQLString,
+				description: "The user's password",
+			},
+			primaryEmail: {
+				type: GraphQLString,
+				description: 'The primary email name for the user',
+			},
+			primaryPhoneNumber: {
+				type: require('../inputs/phone_number_input'),
+				description: 'The primary phone of the user',
+			},
+			primaryAddress: {
+				type: require('../inputs/address_input'),
+				description: 'The primary address of the user',
+			},
+			bio: {
+				type: GraphQLString,
+				description: 'The bio of a user (200 chars limit)',
+			},
 		},
-		async resolve(parentValue, { id, name, email, password }) {
-			const newPassword = {};
-			const newEmail = {};
-			const newName = {};
-
+		async resolve(
+			parentValue,
+			{
+				_id,
+				firstName,
+				lastName,
+				password,
+				primaryEmail,
+				primaryPhoneNumber,
+				primaryAddress,
+				bio,
+			}
+		) {
 			try {
-				if (password) newPassword.password = password;
-				if (name) newName.name = name;
-				if (email) newEmail.email = email;
+				firstName = firstName ? { firstName } : {};
+				lastName = lastName ? { lastName } : {};
+				password = password ? { password } : {};
+				primaryEmail = primaryEmail ? { primaryEmail } : {};
+				primaryPhoneNumber = primaryPhoneNumber ? { primaryPhoneNumber } : {};
+				primaryAddress = primaryAddress ? { primaryAddress } : {};
+				bio = bio ? { bio } : {};
+
+				const filter = { _id };
+				const updateParams = {
+					...firstName,
+					...lastName,
+					...password,
+					...primaryEmail,
+					...primaryPhoneNumber,
+					...primaryAddress,
+					...bio,
+				};
 
 				const updatedUser = await User.findOneAndUpdate(
-					{ _id: id },
-					{ ...newName, ...newEmail, ...newPassword },
-					{ new: true }
+					filter,
+					updateParams,
+					{ new: true } // return document after update was applied.
 				);
 
 				return updatedUser;
-			} catch (err) {
-				console.log(err);
-				return { userErrors: err };
+			} catch (error) {
+				return { error };
 			}
 		},
 	},
-	deleteUser: {
-		type: UserType,
-		args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-		async resolve(parentValue, { id }) {
-			try {
-				const deletedUser = await User.findOneAndDelete(
-					{ _id: id },
-					{ maxTimeMS: 5 }
-				);
+	// deleteUser: {
+	// 	type: require('../types/user_type'),
+	// 	args: { id: { type: new GraphQLNonNull(GraphQLID) } },
+	// 	async resolve(parentValue, { id }) {
+	// 		try {
+	// 			const deletedUser = await User.findOneAndDelete(
+	// 				{ _id: id },
+	// 				{ maxTimeMS: 5 }
+	// 			);
 
-				return deletedUser;
-			} catch (err) {
-				return { userErrors: err };
-			}
-		},
-	},
+	// 			return deletedUser;
+	// 		} catch (err) {
+	// 			return { userErrors: err };
+	// 		}
+	// 	},
+	// },
 	login: {
-		type: UserType,
+		type: require('../types/user_type'),
 		args: {
 			email: { type: new GraphQLNonNull(GraphQLString) },
 			password: { type: new GraphQLNonNull(GraphQLString) },
@@ -141,42 +221,42 @@ const UserMutations = {
 					};
 				}
 
-                const resUser = {};
+				const resUser = {};
 
-				const comparePassword = new Promise((res, reject) => 
-                    bcrypt.compare(password, user.password, (err, isMatch) => {
-                        if (err) throw { err: 'could not compare' };
+				const comparePassword = new Promise((res, reject) =>
+					bcrypt.compare(password, user.password, (err, isMatch) => {
+						if (err) throw { err: 'could not compare' };
 
-                        if (isMatch) {
-                            const payload = { id: user._id, email: user.email };
+						if (isMatch) {
+							const payload = { id: user._id, email: user.email };
 
-                            jwt.sign(
-                                payload,
-                                keys.secretOrKey,
-                                { expiresIn: 3600 },
-                                (err, token) => {
-                                    resUser.email = user.email;
-                                    resUser.name = user.name;
-                                    resUser.id = user._id;
-                                    // res.json({
-                                    //     success: true,
-                                    //     token: 'Bearer ' + token,
-                                    //     user,
-                                    // });
-                                }
-                            );
-                            res('logged in user successfully')
-                        } else {
-                            return res('Incorrect password');
-                        }
-                    })
-                );
+							jwt.sign(
+								payload,
+								keys.secretOrKey,
+								{ expiresIn: 3600 },
+								(err, token) => {
+									resUser.email = user.email;
+									resUser.name = user.name;
+									resUser.id = user._id;
+									// res.json({
+									//     success: true,
+									//     token: 'Bearer ' + token,
+									//     user,
+									// });
+								}
+							);
+							res('logged in user successfully');
+						} else {
+							return res('Incorrect password');
+						}
+					})
+				);
 
 				await comparePassword;
 				return resUser;
 			} catch (err) {
 				console.log(err);
-				return{ userErrors: err };
+				return { userErrors: err };
 			}
 		},
 	},

@@ -1,9 +1,8 @@
 const graphql = require('graphql');
-const { GraphQLObjectType, GraphQLString, GraphQLBoolean, GraphQLInt, GraphQLID } =
-	graphql;
+const { GraphQLInputObjectType, GraphQLString, GraphQLBoolean } = graphql;
 
-const AddressType = new GraphQLObjectType({
-	name: 'AddressType',
+const AddressInput = new GraphQLInputObjectType({
+	name: 'AddressInput',
 	fields: () => ({
 		street: { type: GraphQLString },
 		streetLine2: { type: GraphQLString },
@@ -17,4 +16,4 @@ const AddressType = new GraphQLObjectType({
 	}),
 });
 
-module.exports = AddressType;
+module.exports = AddressInput;

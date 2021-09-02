@@ -11,7 +11,6 @@ const {
 
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
-const Address = mongoose.model('Address');
 const Keyword = mongoose.model('Keyword');
 const File = mongoose.model('File');
 const ProjectFaq = mongoose.model('ProjectFaq');
@@ -91,26 +90,10 @@ const ProjectType = new GraphQLObjectType({
 		primaryAddress: {
 			type: require('./address_type'),
 			description: 'The primary address of the project',
-			args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-			async resolve(parentValue, { id }) {
-				try {
-					return await Address.findById(id);
-				} catch (err) {
-					console.log(err);
-				}
-			},
 		},
 		addresses: {
 			type: new GraphQLList(require('./address_type')),
 			description: 'The address list of the project',
-			args: { ids: { type: new GraphQLList(GraphQLID) } },
-			async resolve(parentValue, { ids }) {
-				try {
-					return await Address.find({ _id: { $in: ids } });
-				} catch (err) {
-					console.log(err);
-				}
-			},
 		},
 		keywords: {
 			type: new GraphQLList(require('./keyword_type')),

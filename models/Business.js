@@ -1,52 +1,47 @@
 const mongoose = require('mongoose');
+const address = require('./object_util/address');
 const Schema = mongoose.Schema;
 const { ObjectId } = Schema.Types;
 
 const BusinessSchema = new Schema({
 	owners: [
-        {
-            type: ObjectId,
-            ref: 'User'
-        }
-    ],
-    name: {
-        type: String,
-        trim: true,
-        required: true
-    },
-    primaryAddress: {
-		type: ObjectId,
-		ref: 'Address',
-	},
-	addresses: [
 		{
 			type: ObjectId,
-			ref: 'Address',
+			ref: 'User',
 		},
 	],
-    primaryPhoneNumber: {
+	name: {
+		type: String,
+		trim: true,
+		required: true,
+	},
+	primaryAddress: address,
+	addresses: [
+		address,
+	],
+	primaryPhoneNumber: {
 		number: { type: String, required: true, trim: true },
-		phoneType: { type: ObjectId, ref: 'PhoneType' },
-		primary: { type: Boolean, required: true },
+		phoneType: { type: String, required: true, trim: true  },
+		primary: { type: Boolean, default: true },
 	},
 	phoneNumbers: [
 		{
 			number: { type: String, required: true, trim: true },
-			phoneType: { type: ObjectId, ref: 'PhoneType' },
+			phoneType: { type: String, required: true, trim: true  },
 			primary: { type: Boolean, required: true },
 		},
 	],
-    businessType: {
-        type: String,
-        trim: true,
-        required: true
-    },
-    description: {
-        type: String,
-        trim: true,
-        required: true
-    },
-    keywords: {
+	businessType: {
+		type: String,
+		trim: true,
+		required: true,
+	},
+	description: {
+		type: String,
+		trim: true,
+		required: true,
+	},
+	keywords: {
 		data: [
 			{
 				type: ObjectId,
@@ -54,32 +49,32 @@ const BusinessSchema = new Schema({
 			},
 		],
 	},
-    followers: [
-        {
-            type: ObjectId,
-            ref: 'User'
-        }
-    ],
-    website: {
-        type: String,
-        required: false
-    },
-    facebook: {
-        type: String,
-        required: false
-    },
-    linkedin: {
-        type: String,
-        required: false
-    },
-    twitter: {
-        type: String,
-        required: false
-    },
-    instagram: {
-        type: String,
-        required: false
-    },
+	followers: [
+		{
+			type: ObjectId,
+			ref: 'User',
+		},
+	],
+	website: {
+		type: String,
+		required: false,
+	},
+	facebook: {
+		type: String,
+		required: false,
+	},
+	linkedin: {
+		type: String,
+		required: false,
+	},
+	twitter: {
+		type: String,
+		required: false,
+	},
+	instagram: {
+		type: String,
+		required: false,
+	},
 });
 
 module.exports = mongoose.model('Business', BusinessSchema);

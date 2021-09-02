@@ -7,7 +7,7 @@ const UserType = require('./user_type');
 
 const RootQuery = new GraphQLObjectType({
 	name: 'RootQueryType',
-	fields: {
+	fields: () => ({
 		users: {
 			type: new GraphQLList(UserType),
 			async resolve() {
@@ -22,7 +22,7 @@ const RootQuery = new GraphQLObjectType({
 				return User.findById(args.id);
 			},
 		},
-	},
+	}),
 });
 
 module.exports = RootQuery;
